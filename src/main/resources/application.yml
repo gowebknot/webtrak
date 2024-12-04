@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: bellboy-service-template
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # Hibernate ddl auto (create, create-drop, validate, update)
+    # Change hibernate.ddl-auto value to validate when flyway is being used.
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${DATABASE_SCHEMA:public}
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  flyway:
+    schemas: ${DATABASE_SCHEMA:public}
+    baseline-on-migrate: true
+
+# Service configuration / env
+template-service:
+  environment: ${ENVIRONMENT:dev}

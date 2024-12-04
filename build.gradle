@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+    id 'checkstyle'
+}
+
+group = 'com.bellboy'
+description = 'bellboy-service-template'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    springVersion = "3.1.2"
+    postgresqlVersion = "42.6.0"
+    lombokVersion = "1.18.28"
+    logstashVersion = "6.4"
+    flywaydbVersion = "8.5.13"
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web:${springVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:${springVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springVersion}"
+    implementation "net.logstash.logback:logstash-logback-encoder:${logstashVersion}"
+    implementation "org.flywaydb:flyway-core:${flywaydbVersion}"
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+
+    developmentOnly "org.springframework.boot:spring-boot-devtools:${springVersion}"
+
+    runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springVersion}"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+checkstyle {
+    configFile file("checkstyle/checkstyle.xml")
+}
+
