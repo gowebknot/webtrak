@@ -1,4 +1,4 @@
-package com.bellboy.template.exception;
+package com.webknot.webtrak.exception;
 
 /**
  * TODO - Change the class and package name according to service.

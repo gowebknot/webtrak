@@ -1,4 +1,4 @@
-package com.bellboy.template.exception;
+package com.webknot.webtrak.exception;
 
 /**
  * This exception can be thrown when there is an issue with the client's request,

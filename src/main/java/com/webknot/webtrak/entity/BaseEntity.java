@@ -1,4 +1,4 @@
-package com.bellboy.template.entity;
+package com.webknot.webtrak.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

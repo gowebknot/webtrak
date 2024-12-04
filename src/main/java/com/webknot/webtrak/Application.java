@@ -1,4 +1,4 @@
-package com.bellboy.template;
+package com.webknot.webtrak;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

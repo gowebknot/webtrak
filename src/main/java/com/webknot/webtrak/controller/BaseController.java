@@ -1,4 +1,4 @@
-package com.bellboy.template.controller;
+package com.webknot.webtrak.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 

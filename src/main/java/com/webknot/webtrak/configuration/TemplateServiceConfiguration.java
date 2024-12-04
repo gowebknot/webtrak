@@ -1,4 +1,4 @@
-package com.bellboy.template.configuration;
+package com.webknot.webtrak.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

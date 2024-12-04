@@ -1,4 +1,4 @@
-package com.bellboy.template.enums;
+package com.webknot.webtrak.enums;
 
 import java.util.stream.Stream;
 
