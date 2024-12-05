@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class AddAllocationDTO {
     private String employeeEmail;
-    private String projectId;
+    private Long projectId;
     private String role;
     private Long allocatedHours;
 }

@@ -26,15 +26,8 @@ public class ProjectServiceController extends BaseController {
 
 
     @PostMapping("project")
-    public ResponseEntity<?> createProject(@RequestBody CreateProjectDTO createProjectDTO) {
-        Project project = projectService.createProject(createProjectDTO);
-
-        if (project != null) {
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
+    public Project createProject(@RequestBody CreateProjectDTO createProjectDTO) {
+        return projectService.createProject(createProjectDTO);
     }
 
     @GetMapping(value = "project")
