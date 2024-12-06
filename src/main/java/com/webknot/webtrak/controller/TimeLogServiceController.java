@@ -56,7 +56,7 @@ public class TimeLogServiceController extends BaseController {
     }
 
     @GetMapping(value = "timelog/get/{projectCode}/{empEmail}/{date}")
-    public List<TimeLog> getTimeLogs(@PathVariable(value = "projectCode") String projectCode,
+    public TimeLogListOutputDTO getTimeLogs(@PathVariable(value = "projectCode") String projectCode,
                                         @PathVariable(value = "empEmail") String empEmail,
                                         @PathVariable(value = "date") String date) throws ParseException {
 
@@ -71,7 +71,7 @@ public class TimeLogServiceController extends BaseController {
     }
 
     @GetMapping(value = "timelog/get/{projectCode}/{empEmail}")
-    public List<TimeLog> getTimeLogsByUserAndProject(@PathVariable("projectCode") String projectCode,
+    public TimeLogListOutputDTO getTimeLogsByUserAndProject(@PathVariable("projectCode") String projectCode,
                                      @PathVariable("empEmail") String empEmail) throws ParseException {
 
         User user = userService.getUserByEmail(empEmail);

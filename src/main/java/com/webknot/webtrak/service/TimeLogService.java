@@ -1,10 +1,7 @@
 package com.webknot.webtrak.service;
 
 import com.sun.jdi.request.InvalidRequestStateException;
-import com.webknot.webtrak.dto.AddAllocationDTO;
-import com.webknot.webtrak.dto.AddTimeLogDTO;
-import com.webknot.webtrak.dto.UpdateTimeLogDTO;
-import com.webknot.webtrak.dto.UpdateTimeLogEntryDTO;
+import com.webknot.webtrak.dto.*;
 import com.webknot.webtrak.entity.Allocation;
 import com.webknot.webtrak.entity.Project;
 import com.webknot.webtrak.entity.TimeLog;
@@ -132,7 +129,7 @@ public class TimeLogService {
         }
     }
 
-    public List<TimeLog> getTimeLogsByDateAndUserAndProject(String date, User user, String projectCode) throws ParseException {
+    public TimeLogListOutputDTO getTimeLogsByDateAndUserAndProject(String date, User user, String projectCode) throws ParseException {
 
         Date parseDate = sdf.parse(date);
 
@@ -149,11 +146,24 @@ public class TimeLogService {
             throw new BadRequestException("Allocation does not exist");
         }
 
-        return timeLogRepository.getTimeLogByDateAndUserAndProject(new java.sql.Date(parseDate.getTime()),
+        List<TimeLog> timelogs = timeLogRepository.getTimeLogByDateAndUserAndProject(new java.sql.Date(parseDate.getTime()),
                 user, project);
+
+        Long totalHours = 0L;
+        for (TimeLog timeLog : timelogs) {
+            totalHours += timeLog.getLoggedHours();
+        }
+
+        TimeLogListOutputDTO listOutputDTO = new TimeLogListOutputDTO();
+        listOutputDTO.setSize(timelogs.size());
+        listOutputDTO.setTotalHours(totalHours);
+        listOutputDTO.setDate(sdf.format(parseDate));
+        listOutputDTO.setTimeLogs(timelogs);
+
+        return  listOutputDTO;
     }
 
-    public List<TimeLog> getTimeLogsByUserAndProject(User user, String projectCode) {
+    public TimeLogListOutputDTO getTimeLogsByUserAndProject(User user, String projectCode) {
 
         Project project = projectService.getProjectByCode(projectCode);
 
@@ -168,7 +178,19 @@ public class TimeLogService {
             throw new BadRequestException("Allocation does not exist");
         }
 
-        return timeLogRepository.getTimeLogByUserAndProject(user, project);
+        List<TimeLog> timelogs = timeLogRepository.getTimeLogByUserAndProject(user, project);
+
+        Long totalHours = 0L;
+        for (TimeLog timeLog : timelogs) {
+            totalHours += timeLog.getLoggedHours();
+        }
+
+        TimeLogListOutputDTO listOutputDTO = new TimeLogListOutputDTO();
+        listOutputDTO.setSize(timelogs.size());
+        listOutputDTO.setTotalHours(totalHours);
+        listOutputDTO.setTimeLogs(timelogs);
+
+        return  listOutputDTO;
     }
 
     public TimeLog getTimeLogById(Long id) {
