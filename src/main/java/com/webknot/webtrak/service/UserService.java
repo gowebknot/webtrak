@@ -5,6 +5,7 @@ import com.webknot.webtrak.entity.User;
 import com.webknot.webtrak.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import java.security.SecureRandom;
 
 /**
  * TODO - Change the class and package name according to service.
@@ -34,6 +35,7 @@ public class UserService {
             user.setEmail(userDTO.getEmail());
             user.setEmpId(userDTO.getEmpId());
             user.setName(userDTO.getName());
+            user.setPrivateKey(generatePassword());
 
     return this.userRepository.save(user);
   }
@@ -45,5 +47,41 @@ public class UserService {
   public User getUserByEmpId(String empId) {
     return this.userRepository.findByEmpId(empId);
   }
+
+    public String generatePassword() {
+      String upperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+      String digits = "0123456789";
+      String specialCharacters = "!@#$%^&*()-_+=<>?/|~";
+
+      String allCharacters = upperCaseLetters + lowerCaseLetters + digits + specialCharacters;
+
+      SecureRandom random = new SecureRandom();
+      StringBuilder password = new StringBuilder();
+
+      // Ensure at least one character from each group
+      password.append(upperCaseLetters.charAt(random.nextInt(upperCaseLetters.length())));
+      password.append(lowerCaseLetters.charAt(random.nextInt(lowerCaseLetters.length())));
+      password.append(digits.charAt(random.nextInt(digits.length())));
+      password.append(specialCharacters.charAt(random.nextInt(specialCharacters.length())));
+
+      // Fill the remaining characters randomly
+      for (int i = 4; i < 8; i++) {
+        password.append(allCharacters.charAt(random.nextInt(allCharacters.length())));
+      }
+
+      // Shuffle the characters to ensure randomness
+      char[] passwordArray = password.toString().toCharArray();
+      for (int i = passwordArray.length - 1; i > 0; i--) {
+        int j = random.nextInt(i + 1);
+        // Swap characters
+        char temp = passwordArray[i];
+        passwordArray[i] = passwordArray[j];
+        passwordArray[j] = temp;
+      }
+
+      // Convert to final password string
+        return new String(passwordArray);
+    }
 
 }

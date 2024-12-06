@@ -25,6 +25,9 @@ public class Project extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "project_code")
+  private String projectCode;
+
   @Column(name = "project_name")
   private String projectName;
 

@@ -1,6 +1,9 @@
 server:
   port: 8080
 
+webtrak:
+  adminPassword: moo$aidTheC0W
+
 spring:
   application:
     name: webtrak
@@ -16,7 +19,7 @@ spring:
     # Hibernate ddl auto (create, create-drop, validate, update)
     # Change hibernate.ddl-auto value to validate when flyway is being used.
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         default_schema: ${DATABASE_SCHEMA:public}

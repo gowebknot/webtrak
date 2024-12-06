@@ -29,7 +29,7 @@ public class ProjectService {
 
   public Project createProject(CreateProjectDTO createProjectDTO) {
 
-    Project extProject = projectRepository.findByProjectName(createProjectDTO.getProjectName());
+    Project extProject = projectRepository.findByProjectCode(createProjectDTO.getProjectCode());
     if (extProject != null) {
       return null;
     }
@@ -40,6 +40,7 @@ public class ProjectService {
     }
 
     Project project = new Project();
+    project.setProjectCode(createProjectDTO.getProjectCode());
     project.setProjectName(createProjectDTO.getProjectName());
     project.setManager(user);
 
@@ -48,8 +49,8 @@ public class ProjectService {
   }
 
 
-  public Optional<Project> getProjectById(Long id) {
-    return projectRepository.findById(id);
+  public Project getProjectByCode(String code) {
+    return projectRepository.findByProjectCode(code);
   }
 
 }

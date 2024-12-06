@@ -5,11 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AddAllocationDTO {
+public class UpdateTimeLogDTO {
     private String employeeEmail;
     private String projectCode;
-    private String role;
-    private Long allocatedHours;
-    private String startDate;
-    private String managerEmail;
+    private String date;
+    private String status;
+    private String approverEmail;
 }

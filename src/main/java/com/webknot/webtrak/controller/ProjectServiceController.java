@@ -3,6 +3,8 @@ package com.webknot.webtrak.controller;
 import com.webknot.webtrak.dto.CreateProjectDTO;
 import com.webknot.webtrak.entity.Project;
 import com.webknot.webtrak.service.ProjectService;
+import com.webknot.webtrak.util.Utils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,20 +22,24 @@ public class ProjectServiceController extends BaseController {
 
     private final ProjectService projectService;
 
+    @Value("${webtrak.adminPassword}")
+    private String adminPassword;
+
     public ProjectServiceController(ProjectService projectService) {
         this.projectService = projectService;
     }
 
 
     @PostMapping("project")
-    public Project createProject(@RequestBody CreateProjectDTO createProjectDTO) {
+    public Project createProject(@RequestHeader("Authorization") String authorization,
+                                 @RequestBody CreateProjectDTO createProjectDTO) {
+        Utils.verifyPassword(authorization, adminPassword);
         return projectService.createProject(createProjectDTO);
     }
 
     @GetMapping(value = "project")
-    public Project getProject(@RequestParam(required = true) Long id) {
-        Optional<Project> project = projectService.getProjectById(id);
-        return project.orElse(null);
+    public Project getProject(@RequestParam(required = true) String projectCode) {
+        return projectService.getProjectByCode(projectCode);
     }
 
 }

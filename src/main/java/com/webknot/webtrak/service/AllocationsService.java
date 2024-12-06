@@ -1,6 +1,7 @@
 package com.webknot.webtrak.service;
 
 import com.webknot.webtrak.dto.AddAllocationDTO;
+import com.webknot.webtrak.dto.UpdateAllocationDTO;
 import com.webknot.webtrak.entity.Allocation;
 import com.webknot.webtrak.entity.Project;
 import com.webknot.webtrak.entity.User;
@@ -9,8 +10,10 @@ import com.webknot.webtrak.repository.AllocationsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * TODO - Change the class and package name according to service.
@@ -26,78 +29,100 @@ public class AllocationsService {
 
     private final ProjectService projectService;
 
+    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
     public AllocationsService(AllocationsRepository allocationsRepository, ProjectService projectService) {
         this.allocationsRepository = allocationsRepository;
         this.projectService = projectService;
     }
 
-    public void addAllocation(AddAllocationDTO addAllocationDTO, User user) {
+    public Allocation addAllocation(AddAllocationDTO addAllocationDTO, User user, User manager) throws ParseException {
 
-        Optional<Project> project = projectService.getProjectById(addAllocationDTO.getProjectId());
+        Project project = projectService.getProjectByCode(addAllocationDTO.getProjectCode());
 
-        if (project.isEmpty()) {
+        if (project == null) {
             throw new BadRequestException("Project does not exist");
         }
 
         Allocation extAllocation = allocationsRepository.findByUserIdAndProjectId(user.getId(),
-                addAllocationDTO.getProjectId());
+                project.getId());
 
         if (extAllocation != null) {
             throw new BadRequestException("Allocation already exists, update if required");
         }
 
+        if(!project.getManager().getEmail().equalsIgnoreCase(manager.getEmail())) {
+            throw new BadRequestException("Needs to be allotted by a manager");
+        }
+
+        Date startDate = addAllocationDTO.getStartDate() == null
+                ? new Date() : sdf.parse(addAllocationDTO.getStartDate());
 
         Allocation allocation = new Allocation();
         allocation.setUser(user);
-        allocation.setProject(project.get());
+        allocation.setProject(project);
         allocation.setAllocatedHours(addAllocationDTO.getAllocatedHours());
         allocation.setRole(addAllocationDTO.getRole());
+        allocation.setStartDate(new java.sql.Date(startDate.getTime()));
 
-        allocationsRepository.save(allocation);
+        return allocationsRepository.save(allocation);
 
     }
 
-    public void updateAllocation(AddAllocationDTO addAllocationDTO, User user) {
+    public Allocation updateAllocation(UpdateAllocationDTO updateAllocationDTO, User user, User manager) throws ParseException {
+
+        Project project = projectService.getProjectByCode(updateAllocationDTO.getProjectCode());
+        if (project == null) {
+            throw new BadRequestException("Project does not exist, create one if required");
+        }
 
         Allocation extAllocation = allocationsRepository.findByUserIdAndProjectId(user.getId(),
-                addAllocationDTO.getProjectId());
+                project.getId());
 
         if (extAllocation == null) {
             throw new BadRequestException("Allocation does not exist, create one if required");
         }
 
-        extAllocation.setAllocatedHours(addAllocationDTO.getAllocatedHours());
-        extAllocation.setRole(addAllocationDTO.getRole());
-
-        allocationsRepository.save(extAllocation);
-
-    }
-
-    public void deleteAllocation(AddAllocationDTO addAllocationDTO, User user) {
-
-        Allocation extAllocation = allocationsRepository.findByUserIdAndProjectId(user.getId(),
-                addAllocationDTO.getProjectId());
-
-        if (extAllocation == null) {
-            throw new BadRequestException("Allocation does not exist");
+        if(!project.getManager().getEmail().equalsIgnoreCase(manager.getEmail())) {
+            throw new BadRequestException("Needs to be allotted by a manager");
         }
 
-        allocationsRepository.delete(extAllocation);
+
+        if (updateAllocationDTO.getStartDate() != null) {
+            Date startDate = sdf.parse(updateAllocationDTO.getStartDate());
+            extAllocation.setStartDate(new java.sql.Date(startDate.getTime()));
+        }
+
+        if (!updateAllocationDTO.isActive()) {
+            Date today = new Date();
+            extAllocation.setIsActive(false);
+            extAllocation.setEndDate(new java.sql.Date(today.getTime()));
+        } else {
+            extAllocation.setAllocatedHours(updateAllocationDTO.getAllocatedHours());
+            extAllocation.setRole(updateAllocationDTO.getRole());
+        }
+
+        return allocationsRepository.save(extAllocation);
 
     }
 
-    public Allocation getAllocations(Long projectId, User user) {
-        return allocationsRepository.findByUserIdAndProjectId(user.getId(),
-                projectId);
-    }
+    public Allocation getAllocations(String projectCode, User user) {
+        Project project = projectService.getProjectByCode(projectCode);
 
-    public List<Allocation> getAllocations(Long projectId) {
-        Optional<Project> project = projectService.getProjectById(projectId);
-
-        if (project.isEmpty()) {
+        if (project == null) {
             throw new BadRequestException("Project does not exist");
         }
-        return allocationsRepository.findByProject(project.get());
+        return allocationsRepository.findByUserIdAndProjectId(user.getId(),
+                project.getId());
+    }
+
+    public List<Allocation> getAllocations(String projectCode) {
+        Project project = projectService.getProjectByCode(projectCode);
+
+        if (project == null) {
+            throw new BadRequestException("Project does not exist");
+        }
+        return allocationsRepository.findByProject(project);
     }
 
     public List<Allocation> getAllocations(User user) {

@@ -29,6 +29,11 @@ public interface AllocationsRepository extends JpaRepository<Allocation, Long> {
             nativeQuery = true)
     Allocation findByUserIdAndProjectId(Long userId, Long projectId);
 
+    @Query(
+            value = "SELECT * FROM allocations where user_id = ?1 and project_code = ?2",
+            nativeQuery = true)
+    Allocation findByUserIdAndProjectCode(Long userId, String projectCode);
+
     List<Allocation> findByProject(Project project);
 
     List<Allocation> findByUser(User user);

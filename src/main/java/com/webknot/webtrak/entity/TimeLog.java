@@ -16,8 +16,8 @@ import java.sql.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "allocations")
-public class Allocation extends BaseEntity {
+@Table(name = "time_log")
+public class TimeLog extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,25 +25,23 @@ public class Allocation extends BaseEntity {
 
   @ManyToOne()
   @JoinColumn(name = "project_id")
+  @JsonIgnore
   private Project project;
 
   @ManyToOne()
   @JoinColumn(name = "user_id")
   private User user;
 
-  @Column(name = "allocated_hours")
-  private Long allocatedHours;
+  @Column(name = "logged_hours")
+  private Long loggedHours;
 
-  @Column(name = "role")
-  private String role;
+  @Column(name = "description")
+  private String description;
 
-  @Column(name = "start_date")
-  private Date startDate;
+  @Column(name = "date")
+  private Date date;
 
-  @Column(name = "end_date")
-  private Date endDate;
-
-  @Column(name = "is_active")
-  private Boolean isActive = true;
+  @Column(name = "status")
+  private String status;
 
 }

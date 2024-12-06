@@ -1,9 +1,13 @@
 package com.webknot.webtrak.controller;
 
 import com.webknot.webtrak.dto.UserCreateDTO;
+import com.webknot.webtrak.dto.UserOutputDTO;
 import com.webknot.webtrak.entity.User;
 import com.webknot.webtrak.exception.BadRequestException;
 import com.webknot.webtrak.service.UserService;
+import com.webknot.webtrak.util.Utils;
+import jakarta.websocket.server.PathParam;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,20 +23,36 @@ public class UserServiceController extends BaseController {
 
     private final UserService userService;
 
+    @Value("${webtrak.adminPassword}")
+    private String adminPassword;
+
     public UserServiceController(UserService userService) {
         this.userService = userService;
     }
 
 
     @PostMapping("user")
-    public ResponseEntity<?> createUser(@RequestBody UserCreateDTO userCreateDTO) {
-        User user = userService.createUser(userCreateDTO);
+    public User createUser(@RequestHeader("Authorization") String authorization,
+                                    @RequestBody UserCreateDTO userCreateDTO) {
 
-        if (user != null) {
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        Utils.verifyPassword(adminPassword, authorization);
+
+        return userService.createUser(userCreateDTO);
+
+    }
+
+    @GetMapping("privateKey/{userEmail}")
+    public String getPrivateKey(@RequestHeader("Authorization") String authorization,
+            @PathVariable(value = "userEmail") String userEmail) {
+
+        Utils.verifyPassword(adminPassword, authorization);
+
+        User user = userService.getUserByEmail(userEmail);
+
+        if (user == null) {
+            throw new BadRequestException("User not found");
         }
+        return user.getPrivateKey();
 
     }
 
