@@ -27,7 +27,6 @@ ext {
     postgresqlVersion = "42.6.0"
     lombokVersion = "1.18.28"
     logstashVersion = "6.4"
-    flywaydbVersion = "8.5.13"
 }
 
 dependencies {
@@ -35,7 +34,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator:${springVersion}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springVersion}"
     implementation "net.logstash.logback:logstash-logback-encoder:${logstashVersion}"
-    implementation "org.flywaydb:flyway-core:${flywaydbVersion}"
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -53,4 +51,5 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
 
