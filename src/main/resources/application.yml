@@ -9,20 +9,20 @@ spring:
     name: webtrak
 
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
+    driverClassName: org.postgresql.Driver
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     # Hibernate ddl auto (create, create-drop, validate, update)
     # Change hibernate.ddl-auto value to validate when flyway is being used.
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        default_schema: ${DATABASE_SCHEMA:public}
+        default_schema: public
         jdbc:
           lob:
             non_contextual_creation: true
