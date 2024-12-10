@@ -46,4 +46,5 @@ public class Allocation extends BaseEntity {
   @Column(name = "is_active")
   private Boolean isActive = true;
 
+
 }

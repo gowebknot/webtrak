@@ -1,6 +1,7 @@
 package com.webknot.webtrak.controller;
 
 import com.webknot.webtrak.dto.AddAllocationDTO;
+import com.webknot.webtrak.dto.AllocationOutputDTO;
 import com.webknot.webtrak.dto.UpdateAllocationDTO;
 import com.webknot.webtrak.entity.Allocation;
 import com.webknot.webtrak.entity.User;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -59,23 +61,24 @@ public class AllocationsServiceController extends BaseController {
     }
 
     @GetMapping(value = "allocation")
-    public List<Allocation> getAllocations(@RequestParam(required = false) String projectCode,
+    public List<AllocationOutputDTO> getAllocations(@RequestParam(required = false) String projectCode,
                                   @RequestParam(required = false) String userEmail) {
 
 
         if (projectCode != null && userEmail != null) {
             User user = userService.getUserByEmail(userEmail);
             Allocation allocation = allocationsService.getAllocations(projectCode, user);
-            return Arrays.asList(allocation);
+
+            return Utils.getAllocationOutputDTO(Arrays.asList(allocation));
         }
 
         if (projectCode != null) {
-            return allocationsService.getAllocations(projectCode);
+            return Utils.getAllocationOutputDTO(allocationsService.getAllocations(projectCode));
         }
 
         if (userEmail != null) {
             User user = userService.getUserByEmail(userEmail);
-            return allocationsService.getAllocations(user);
+            return Utils.getAllocationOutputDTO(allocationsService.getAllocations(user));
         }
 
         return Collections.emptyList();
