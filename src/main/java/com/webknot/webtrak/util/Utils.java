@@ -1,7 +1,9 @@
 package com.webknot.webtrak.util;
 
 import com.webknot.webtrak.dto.AllocationOutputDTO;
+import com.webknot.webtrak.dto.TimeLogOutputDTO;
 import com.webknot.webtrak.entity.Allocation;
+import com.webknot.webtrak.entity.TimeLog;
 import com.webknot.webtrak.exception.BadRequestException;
 
 import java.util.ArrayList;
@@ -34,4 +36,19 @@ public class Utils {
         return allocationOutputs;
     }
 
+    public static List<TimeLogOutputDTO> getTimeLogsOutput(List<TimeLog> timelogs) {
+        List<TimeLogOutputDTO> timeLogOutputDTOS = new ArrayList<>();
+
+        for (TimeLog timeLog : timelogs) {
+            timeLogOutputDTOS.add(TimeLogOutputDTO.builder()
+                    .id(timeLog.getId())
+                    .projectCode(timeLog.getProject().getProjectCode())
+                    .userEmail(timeLog.getUser().getEmail())
+                    .loggedHours(timeLog.getLoggedHours())
+                    .status(timeLog.getStatus())
+                    .description(timeLog.getDescription())
+                    .build());
+        }
+        return timeLogOutputDTOS;
+    }
 }

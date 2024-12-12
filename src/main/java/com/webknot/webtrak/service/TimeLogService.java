@@ -9,6 +9,7 @@ import com.webknot.webtrak.entity.User;
 import com.webknot.webtrak.exception.BadRequestException;
 import com.webknot.webtrak.repository.AllocationsRepository;
 import com.webknot.webtrak.repository.TimeLogRepository;
+import com.webknot.webtrak.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -158,7 +159,7 @@ public class TimeLogService {
         listOutputDTO.setSize(timelogs.size());
         listOutputDTO.setTotalHours(totalHours);
         listOutputDTO.setDate(sdf.format(parseDate));
-        listOutputDTO.setTimeLogs(timelogs);
+        listOutputDTO.setTimeLogs(Utils.getTimeLogsOutput(timelogs));
 
         return  listOutputDTO;
     }
@@ -188,7 +189,7 @@ public class TimeLogService {
         TimeLogListOutputDTO listOutputDTO = new TimeLogListOutputDTO();
         listOutputDTO.setSize(timelogs.size());
         listOutputDTO.setTotalHours(totalHours);
-        listOutputDTO.setTimeLogs(timelogs);
+        listOutputDTO.setTimeLogs(Utils.getTimeLogsOutput(timelogs));
 
         return  listOutputDTO;
     }

@@ -13,5 +13,5 @@ public class TimeLogListOutputDTO {
     private long size;
     private Long totalHours;
     private String date;
-    private List<TimeLog> timeLogs;
+    private List<TimeLogOutputDTO> timeLogs;
 }
