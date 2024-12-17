@@ -1,5 +1,6 @@
 package com.webknot.webtrak.controller;
 
+import com.webknot.webtrak.dto.GenericResponseDTO;
 import com.webknot.webtrak.dto.UserCreateDTO;
 import com.webknot.webtrak.dto.UserOutputDTO;
 import com.webknot.webtrak.entity.User;
@@ -32,17 +33,20 @@ public class UserServiceController extends BaseController {
 
 
     @PostMapping("user")
-    public User createUser(@RequestHeader("Authorization") String authorization,
-                                    @RequestBody UserCreateDTO userCreateDTO) {
+    public ResponseEntity<GenericResponseDTO> createUser(@RequestHeader("Authorization") String authorization,
+                                                         @RequestBody UserCreateDTO userCreateDTO) {
 
         Utils.verifyPassword(adminPassword, authorization);
 
-        return userService.createUser(userCreateDTO);
-
+        User user = userService.createUser(userCreateDTO);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(new GenericResponseDTO("Unable to create user", null));
+        }
+        return ResponseEntity.ok().body(new GenericResponseDTO("success", user));
     }
 
     @GetMapping("privateKey/{userEmail}")
-    public String getPrivateKey(@RequestHeader("Authorization") String authorization,
+    public ResponseEntity<GenericResponseDTO> getPrivateKey(@RequestHeader("Authorization") String authorization,
             @PathVariable(value = "userEmail") String userEmail) {
 
         Utils.verifyPassword(adminPassword, authorization);
@@ -50,21 +54,21 @@ public class UserServiceController extends BaseController {
         User user = userService.getUserByEmail(userEmail);
 
         if (user == null) {
-            throw new BadRequestException("User not found");
+            ResponseEntity.badRequest().body("User not found");
         }
-        return user.getPrivateKey();
+        return ResponseEntity.ok().body(new GenericResponseDTO("success", user.getPrivateKey()));
 
     }
 
     @GetMapping(value = "user")
-    public User getUser(@RequestParam(required = false) String email,
+    public ResponseEntity<GenericResponseDTO> getUser(@RequestParam(required = false) String email,
                         @RequestParam(required = false) String empId) {
         if (email != null) {
-            return userService.getUserByEmail(email);
+            return ResponseEntity.ok().body(new GenericResponseDTO("success", userService.getUserByEmail(email)));
         } else if (empId != null) {
-            return userService.getUserByEmpId(empId);
+            return ResponseEntity.ok().body(new GenericResponseDTO("success", userService.getUserByEmpId(empId)));
         } else {
-            throw new BadRequestException("Invalid query parameter");
+            return ResponseEntity.badRequest().body(null);
         }
     }
 

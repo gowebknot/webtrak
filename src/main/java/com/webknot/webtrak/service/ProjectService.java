@@ -3,6 +3,7 @@ package com.webknot.webtrak.service;
 import com.webknot.webtrak.dto.CreateProjectDTO;
 import com.webknot.webtrak.entity.Project;
 import com.webknot.webtrak.entity.User;
+import com.webknot.webtrak.exception.BadRequestException;
 import com.webknot.webtrak.repository.ProjectRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,12 +32,12 @@ public class ProjectService {
 
     Project extProject = projectRepository.findByProjectCode(createProjectDTO.getProjectCode());
     if (extProject != null) {
-      return null;
+      throw new BadRequestException("Project already exists");
     }
 
     User user = userService.getUserByEmail(createProjectDTO.getManagerEmail());
     if (user == null) {
-      return null;
+      throw new BadRequestException("Manager not found");
     }
 
     Project project = new Project();

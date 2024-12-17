@@ -2,6 +2,7 @@ package com.webknot.webtrak.controller;
 
 import com.webknot.webtrak.dto.AddAllocationDTO;
 import com.webknot.webtrak.dto.AllocationOutputDTO;
+import com.webknot.webtrak.dto.GenericResponseDTO;
 import com.webknot.webtrak.dto.UpdateAllocationDTO;
 import com.webknot.webtrak.entity.Allocation;
 import com.webknot.webtrak.entity.User;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO - Change the class and package name according to service.
@@ -38,72 +40,111 @@ public class AllocationsServiceController extends BaseController {
 
 
     @PostMapping("allocation")
-    public Allocation addAllocation(@RequestHeader("Authorization") String authorization,
-                                    @RequestBody AddAllocationDTO addAllocationDTO) throws ParseException {
+    public ResponseEntity<GenericResponseDTO> addAllocation(@RequestHeader("Authorization") String authorization,
+                                                            @RequestBody AddAllocationDTO addAllocationDTO) throws ParseException {
 
 
         User manager = userService.getUserByEmail(addAllocationDTO.getManagerEmail());
         if (manager == null) {
-            throw new BadRequestException("Manager not found");
+            return ResponseEntity.badRequest().body(new GenericResponseDTO("Manager not found", null));
         }
-
-        Utils.verifyPassword(authorization, manager.getPrivateKey());
 
 
         User user = userService.getUserByEmail(addAllocationDTO.getEmployeeEmail());
 
         if (user == null) {
-            throw new BadRequestException("User not found");
+            return ResponseEntity.badRequest().body(new GenericResponseDTO("User not found", null));
         }
 
-        return allocationsService.addAllocation(addAllocationDTO, user, manager);
+
+        try {
+            Utils.verifyPassword(authorization, manager.getPrivateKey());
+            return ResponseEntity.ok().body(new GenericResponseDTO("success",
+                    allocationsService.addAllocation(addAllocationDTO, user, manager)));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new GenericResponseDTO(ex.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new GenericResponseDTO(e.getMessage(), null));
+        }
 
     }
 
     @GetMapping(value = "allocation")
-    public List<AllocationOutputDTO> getAllocations(@RequestParam(required = false) String projectCode,
+    public ResponseEntity<GenericResponseDTO> getAllocations(@RequestParam(required = false) String projectCode,
                                   @RequestParam(required = false) String userEmail) {
 
 
         if (projectCode != null && userEmail != null) {
-            User user = userService.getUserByEmail(userEmail);
-            Allocation allocation = allocationsService.getAllocations(projectCode, user);
 
-            return Utils.getAllocationOutputDTO(Arrays.asList(allocation));
+
+            try {
+                User user = userService.getUserByEmail(userEmail);
+                Allocation allocation = allocationsService.getAllocations(projectCode, user);
+
+                return ResponseEntity.ok().body(new GenericResponseDTO("success",
+                        Utils.getAllocationOutputDTO(Arrays.asList(allocation))));
+            } catch (BadRequestException ex) {
+                return ResponseEntity.badRequest().body(new GenericResponseDTO(ex.getMessage(), null));
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().body(new GenericResponseDTO(e.getMessage(), null));
+            }
+
         }
 
         if (projectCode != null) {
-            return Utils.getAllocationOutputDTO(allocationsService.getAllocations(projectCode));
+
+            try {
+
+                return ResponseEntity.ok().body(new GenericResponseDTO("success",
+                        Utils.getAllocationOutputDTO(allocationsService.getAllocations(projectCode))));
+            } catch (BadRequestException ex) {
+                return ResponseEntity.badRequest().body(new GenericResponseDTO(ex.getMessage(), null));
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().body(new GenericResponseDTO(e.getMessage(), null));
+            }
         }
 
         if (userEmail != null) {
-            User user = userService.getUserByEmail(userEmail);
-            return Utils.getAllocationOutputDTO(allocationsService.getAllocations(user));
+            try {
+                User user = userService.getUserByEmail(userEmail);
+                return ResponseEntity.ok().body(new GenericResponseDTO("success",
+                        Utils.getAllocationOutputDTO(allocationsService.getAllocations(user))));
+            } catch (BadRequestException ex) {
+                return ResponseEntity.badRequest().body(new GenericResponseDTO(ex.getMessage(), null));
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().body(new GenericResponseDTO(e.getMessage(), null));
+            }
         }
 
-        return Collections.emptyList();
+        return ResponseEntity.ok().body(new GenericResponseDTO("success", Collections.emptyList()));
 
     }
 
     @PutMapping("allocation")
-    public Allocation updateAllocation(@RequestHeader("Authorization") String authorization,
+    public ResponseEntity<GenericResponseDTO> updateAllocation(@RequestHeader("Authorization") String authorization,
             @RequestBody UpdateAllocationDTO updateAllocationDTO) throws ParseException {
 
         User user = userService.getUserByEmail(updateAllocationDTO.getEmployeeEmail());
 
         User manager = userService.getUserByEmail(updateAllocationDTO.getManagerEmail());
         if (manager == null) {
-            throw new BadRequestException("Manager not found");
+            return ResponseEntity.badRequest().body(new GenericResponseDTO("Manager not found", null));
         }
 
         if (user == null) {
-            throw new BadRequestException("User not found");
+            return ResponseEntity.badRequest().body(new GenericResponseDTO("User not found", null));
         }
 
         Utils.verifyPassword(authorization, manager.getPrivateKey());
 
-        return allocationsService.updateAllocation(updateAllocationDTO, user, manager);
-
+        try {
+            return ResponseEntity.ok().body(new GenericResponseDTO("success",
+                    allocationsService.updateAllocation(updateAllocationDTO, user, manager)));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new GenericResponseDTO(ex.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new GenericResponseDTO(e.getMessage(), null));
+        }
     }
 
 }

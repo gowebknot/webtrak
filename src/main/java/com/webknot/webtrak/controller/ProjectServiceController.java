@@ -1,14 +1,18 @@
 package com.webknot.webtrak.controller;
 
 import com.webknot.webtrak.dto.CreateProjectDTO;
+import com.webknot.webtrak.dto.GenericResponseDTO;
 import com.webknot.webtrak.entity.Project;
+import com.webknot.webtrak.exception.BadRequestException;
 import com.webknot.webtrak.service.ProjectService;
 import com.webknot.webtrak.util.Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -31,15 +35,30 @@ public class ProjectServiceController extends BaseController {
 
 
     @PostMapping("project")
-    public Project createProject(@RequestHeader("Authorization") String authorization,
-                                 @RequestBody CreateProjectDTO createProjectDTO) {
-        Utils.verifyPassword(authorization, adminPassword);
-        return projectService.createProject(createProjectDTO);
+    public ResponseEntity<GenericResponseDTO> createProject(@RequestHeader("Authorization") String authorization,
+                                                            @RequestBody CreateProjectDTO createProjectDTO) {
+
+        try {
+            Utils.verifyPassword(authorization, adminPassword);
+            return ResponseEntity.ok().body(new GenericResponseDTO("success", projectService.createProject(createProjectDTO)));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new GenericResponseDTO(ex.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new GenericResponseDTO(e.getMessage(), null));
+        }
+
     }
 
     @GetMapping(value = "project")
-    public Project getProject(@RequestParam(required = true) String projectCode) {
-        return projectService.getProjectByCode(projectCode);
+    public ResponseEntity<GenericResponseDTO> getProject(@RequestParam(required = true) String projectCode) {
+
+        try {
+            return ResponseEntity.ok().body(new GenericResponseDTO("success", projectService.getProjectByCode(projectCode)));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new GenericResponseDTO(ex.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new GenericResponseDTO(e.getMessage(), null));
+        }
     }
 
 }
